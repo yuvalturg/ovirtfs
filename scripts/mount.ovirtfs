@@ -1,0 +1,1 @@
+python -m ovirtfs -f /tmp/foo

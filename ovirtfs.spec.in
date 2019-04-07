@@ -1,0 +1,101 @@
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%global with_python3 1
+%else
+%global with_python3 0
+%endif
+
+%if 0%{?rhel} >= 8
+%global with_python2 0
+%else
+%global with_python2 1
+%endif
+
+%global _configure ../configure
+%define debug_package %{nil}
+
+
+Name:       ovirtfs
+Version:    @PACKAGE_RPM_VERSION@
+Release:    %{?_release}%{?!_release:1}%{?dist}
+Summary:    oVirt file system in userspace
+License:    GPLv2+
+URL:        https://www.github.com/yuvalturg/ovirtfs
+Source0:    %{name}-%{version}.tar.xz
+BuildArch:  noarch
+
+%description
+oVirt FS is a filesystem in userspace (FUSE) that wraps the oVirt SDK
+
+%if 0%{?with_python2}
+%package -n python2-ovirtfs
+Summary:    A python 2 module for ovirtfs
+Requires:       python-ovirt-engine-sdk4
+Requires:       python2-fuse
+BuildRequires:  python-devel
+
+%description -n python2-ovirtfs
+python2-ovirtfs is a python 2 wrapper around the oVirt engine SDK
+that implements the FUSE api
+%endif # with_python2
+
+%if 0%{?with_python3}
+%package -n python%{python3_pkgversion}-ovirtfs
+Summary:    A python 2 module for ovirtfs
+Requires:       python%{python3_pkgversion}-ovirt-engine-sdk4
+Requires:       python%{python3_pkgversion}-fuse
+BuildRequires:  python%{python3_pkgversion}-devel
+
+%description -n python%{python3_pkgversion}-ovirtfs
+python%{python3_pkgversion}-ovirtfs is a python 3 wrapper around the oVirt
+engine SDK that implements the FUSE api
+%endif # with_python3
+
+
+%prep
+%setup -q
+
+
+%build
+%if 0%{?with_python2}
+mkdir py2 && pushd py2
+%configure PYTHON="%{__python2}"
+make %{?_smp_mflags}
+popd
+%endif # with_python2
+
+%if 0%{?with_python3}
+mkdir py3 && pushd py3
+%configure PYTHON="%{__python3}"
+make %{?_smp_mflags}
+%endif # with_python3
+
+
+%install
+%if 0%{?with_python2}
+make -C py2 install DESTDIR="%{buildroot}"
+%endif # with_python2
+
+%if 0%{?with_python3}
+make -C py3 install DESTDIR="%{buildroot}"
+%endif # with_python3
+
+
+%files
+%doc README.md
+%license LICENSE
+%{_sbindir}/mount.ovirtfs
+
+%if 0%{?with_python2}
+%files -n python2-ovirtfs
+%{python2_sitelib}/%{name}/
+%endif
+
+%if 0%{?with_python3}
+%files -n python%{python3_pkgversion}-ovirtfs
+%{python3_sitelib}/%{name}/
+%endif
+
+
+%changelog
+* Mon Apr 08 2019 Yuval Turgeman <yturgema@redhat.com> - 1.0.0-1
+- Initial build
