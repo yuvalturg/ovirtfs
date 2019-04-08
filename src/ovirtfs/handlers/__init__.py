@@ -1,3 +1,4 @@
+import os
 import pkgutil
 import logging
 
@@ -19,14 +20,12 @@ class BaseHandler(object):
     def _get_object(self, params):
         if not self._service:
             return None
-        fltr = "name=%s" % params["name"]
+        fltr = "{}={}".format(self._tag_name, params[self._tag_name])
         objects = self._service.list(search=fltr)
         if not objects:
             raise RuntimeError("Missing object %s" % params)
         return objects[0]
 
-
-class RootHandler(BaseHandler):
     def getattr(self, params):
         return dir_stat()
 
@@ -35,22 +34,21 @@ class RootHandler(BaseHandler):
 
 
 class DirNameHandler(BaseHandler):
-    files = []
-    links = []
-    dirs = []
+    content = []
 
     def getattr(self, params):
         self._get_object(params)
         return dir_stat()
 
     def readdir(self, _):
-        return self.files + self.links + self.dirs
+        return self.content
 
 
-class RegFileHandler(BaseHandler):
+class RawAttrFileHandler(BaseHandler):
     def _get_value(self, params):
         host = self._get_object(params)
-        return str(getattr(host, params["action"])) + "\n"
+        attr = os.path.basename(params["rawpath"])
+        return str(getattr(host, attr)) + "\n"
 
     def getattr(self, params):
         return file_stat(size=len(self._get_value(params)))
@@ -61,10 +59,10 @@ class RegFileHandler(BaseHandler):
 
 class SymlinkHandler(BaseHandler):
     _other_svc = None
-    _my_attr = None
+    _my_attr = None # link name
     _cmp_attr = "id"
     _ret_attr = "name"
-    _lnk_fmt = None
+    _lnk_fmt = None # link target
 
     def __init__(self, connection):
         BaseHandler.__init__(self, connection)

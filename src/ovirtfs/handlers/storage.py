@@ -1,4 +1,5 @@
-from . import RootHandler, DirNameHandler, RegFileHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler
+from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
 
@@ -7,20 +8,16 @@ class BaseStorageDomainMixIn(object):
     _svc_name = "storage_domains_service"
 
 
-@PathResolver("/storage_domains")
-class StorageDomainsHandler(BaseStorageDomainMixIn, RootHandler):
-    pass
+@PathResolver("storage_domains", parent=RootHandler)
+class StorageDomainsHandler(BaseStorageDomainMixIn, BaseHandler):
+    content = []
 
 
-@PathResolver("/storage_domains/{}".format(subpath("name")))
+@PathResolver(subpath("name"), parent=StorageDomainsHandler)
 class StorageDomainNameHandler(BaseStorageDomainMixIn, DirNameHandler):
-    files = ["id"]
+    content = []
 
 
-@PathResolver("/storage_domains/{}/{}".format(
-    subpath("name"),
-    subpath("action", StorageDomainNameHandler.files)
-    )
-             )
-class StorageDomainFileHandler(BaseStorageDomainMixIn, RegFileHandler):
+@PathResolver(["id"], parent=StorageDomainNameHandler)
+class StorageDomainFileHandler(BaseStorageDomainMixIn, RawAttrFileHandler):
     pass

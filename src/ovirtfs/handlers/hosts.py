@@ -1,37 +1,29 @@
-import logging
-
-from . import RootHandler, DirNameHandler, RegFileHandler, SymlinkHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler, SymlinkHandler
+from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
-
-LOG = logging.getLogger(__package__)
 
 
 class BaseHostMixIn(object):
     _svc_name = "hosts_service"
 
 
-@PathResolver("/hosts")
-class RootHostsHandler(BaseHostMixIn, RootHandler):
-    pass
+@PathResolver("hosts", parent=RootHandler)
+class RootHostsHandler(BaseHostMixIn, BaseHandler):
+    content = []
 
 
-@PathResolver("/hosts/{}".format(subpath("name")))
+@PathResolver(subpath("name"), parent=RootHostsHandler)
 class HostNameHandler(BaseHostMixIn, DirNameHandler):
-    files = ["status", "address", "comment", "id"]
-    links = ["cluster"]
+    content = []
 
 
-@PathResolver("/hosts/{}/{}".format(
-    subpath("name"),
-    subpath("action", HostNameHandler.files)
-    )
-             )
-class HostFileHandler(BaseHostMixIn, RegFileHandler):
+@PathResolver(["id", "comment"], parent=HostNameHandler)
+class HostFileHandler(BaseHostMixIn, RawAttrFileHandler):
     pass
 
 
-@PathResolver("/hosts/{}/cluster".format(subpath("name")))
+@PathResolver("cluster", parent=HostNameHandler)
 class HostClusterHandler(BaseHostMixIn, SymlinkHandler):
     _other_svc = "clusters_service"
     _my_attr = "cluster"
