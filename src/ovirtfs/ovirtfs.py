@@ -1,5 +1,6 @@
 import os
 import errno
+import traceback
 import logging
 import fuse
 
@@ -30,7 +31,8 @@ class OVirtFS(fuse.Fuse):
             return -errno.ENOENT
         try:
             return handler.getattr(args)
-        except:
+        except RuntimeError as e:
+            LOG.error(traceback.format_exc())
             return -errno.ENOENT
 
     def readdir(self, path, offset):
@@ -71,5 +73,6 @@ class OVirtFS(fuse.Fuse):
             return -errno.ENOENT
         try:
             return handler.readlink(args)
-        except:
+        except RuntimeError as e:
+            LOG.error(traceback.format_exc())
             return -errno.ENOENT

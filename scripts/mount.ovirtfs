@@ -1,1 +1,9 @@
-python -m ovirtfs -f /tmp/foo
+#!/bin/bash
+
+PYTHON=python
+
+#if [[ -n "$(which python3 2>&-)" ]]; then
+#  PYTHON=python3
+#fi
+
+$PYTHON -m ovirtfs.__main__ $@
