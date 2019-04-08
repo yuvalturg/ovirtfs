@@ -1,4 +1,5 @@
-from . import RootHandler, DirNameHandler, RegFileHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler
+from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
 
@@ -7,20 +8,16 @@ class BaseDataCenterMixIn(object):
     _svc_name = "data_centers_service"
 
 
-@PathResolver("/data_centers")
-class RootDataCentersHandler(BaseDataCenterMixIn, RootHandler):
-    pass
+@PathResolver("data_centers", parent=RootHandler)
+class RootDataCentersHandler(BaseDataCenterMixIn, BaseHandler):
+    content = []
 
 
-@PathResolver("/data_centers/{}".format(subpath("name")))
+@PathResolver(subpath("name"), parent=RootDataCentersHandler)
 class DataCenterNameHandler(BaseDataCenterMixIn, DirNameHandler):
-    files = ["id"]
+    content = []
 
 
-@PathResolver("/data_centers/{}/{}".format(
-    subpath("name"),
-    subpath("action", DataCenterNameHandler.files)
-    )
-             )
-class DataCenterFileHandler(BaseDataCenterMixIn, RegFileHandler):
+@PathResolver(["id"], parent=DataCenterNameHandler)
+class DataCenterFileHandler(BaseDataCenterMixIn, RawAttrFileHandler):
     pass
