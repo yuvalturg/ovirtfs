@@ -26,25 +26,25 @@ class OVirtFS(fuse.Fuse):
 
     def getattr(self, path):
         LOG.debug("getattr() called for path=(%s)", path)
-        handler, args = PathResolver.get_handler_args(path, self._connection)
+        handler, params = PathResolver.parse(path, self._connection)
         if handler is None:
             return -errno.ENOENT
         try:
-            return handler.getattr(args)
+            return handler.getattr(params)
         except RuntimeError:
             LOG.error(traceback.format_exc())
             return -errno.ENOENT
 
     def readdir(self, path, offset):
         LOG.debug("readdir() called with path=(%s) offset=(%s)", path, offset)
-        handler, args = PathResolver.get_handler_args(path, self._connection)
-        entries = handler.readdir(args)
+        handler, params = PathResolver.parse(path, self._connection)
+        entries = handler.readdir(params)
         for entry in entries:
             yield fuse.Direntry(entry)
 
     def open(self, path, flags):
         LOG.debug("open() called for path=(%s)", path)
-        handler, _ = PathResolver.get_handler_args(path, self._connection)
+        handler, _ = PathResolver.parse(path, self._connection)
         if handler is None:
             return -errno.ENOENT
         accmode = os.O_RDONLY | os.O_WRONLY | os.O_RDWR
@@ -53,10 +53,10 @@ class OVirtFS(fuse.Fuse):
         return 0
 
     def read(self, path, size, offset):
-        handler, args = PathResolver.get_handler_args(path, self._connection)
+        handler, params = PathResolver.parse(path, self._connection)
         if handler is None:
             return -errno.ENOENT
-        data = handler.read(args)
+        data = handler.read(params)
         slen = len(data)
         if offset < slen:
             if offset + size > slen:
@@ -68,11 +68,11 @@ class OVirtFS(fuse.Fuse):
 
     def readlink(self, path):
         LOG.debug("readlink() called for path=(%s)", path)
-        handler, args = PathResolver.get_handler_args(path, self._connection)
+        handler, params = PathResolver.parse(path, self._connection)
         if handler is None:
             return -errno.ENOENT
         try:
-            return handler.readlink(args)
+            return handler.readlink(params)
         except RuntimeError:
             LOG.error(traceback.format_exc())
             return -errno.ENOENT

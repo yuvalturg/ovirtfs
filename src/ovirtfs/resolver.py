@@ -24,15 +24,15 @@ class PathResolver(object):
         return Wrapper
 
     @staticmethod
-    def get_handler_args(path, connection):
+    def parse(path, connection):
         for rpath, rcls in PathResolver._registry.items():
             match = rpath.search(path)
             if not match:
                 continue
-            args = match.groupdict()
-            LOG.debug("Handler %s for [%s], args=%s", rcls, path, args)
+            params = match.groupdict()
+            LOG.debug("Handler %s for [%s], params=%s", rcls, path, params)
             if rcls not in PathResolver._instances:
                 PathResolver._instances[rcls] = rcls(connection)
-            return PathResolver._instances[rcls], args
+            return PathResolver._instances[rcls], params
         LOG.error("Handler was not found for path [%s]", path)
         return None, None

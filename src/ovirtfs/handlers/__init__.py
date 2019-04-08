@@ -16,18 +16,18 @@ class BaseHandler(object):
             self._service = getattr(connection.system_service(),
                                     self._svc_name)()
 
-    def _get_object(self, args):
+    def _get_object(self, params):
         if not self._service:
             return None
-        fltr = "name=%s" % args["name"]
+        fltr = "name=%s" % params["name"]
         objects = self._service.list(search=fltr)
         if not objects:
-            raise RuntimeError("Missing object %s" % args)
+            raise RuntimeError("Missing object %s" % params)
         return objects[0]
 
 
 class RootHandler(BaseHandler):
-    def getattr(self, args):
+    def getattr(self, params):
         return dir_stat()
 
     def readdir(self, _):
@@ -39,8 +39,8 @@ class DirNameHandler(BaseHandler):
     links = []
     dirs = []
 
-    def getattr(self, args):
-        self._get_object(args)
+    def getattr(self, params):
+        self._get_object(params)
         return dir_stat()
 
     def readdir(self, _):
@@ -48,15 +48,15 @@ class DirNameHandler(BaseHandler):
 
 
 class RegFileHandler(BaseHandler):
-    def _get_value(self, args):
-        host = self._get_object(args)
-        return str(getattr(host, args["action"])) + "\n"
+    def _get_value(self, params):
+        host = self._get_object(params)
+        return str(getattr(host, params["action"])) + "\n"
 
-    def getattr(self, args):
-        return file_stat(size=len(self._get_value(args)))
+    def getattr(self, params):
+        return file_stat(size=len(self._get_value(params)))
 
-    def read(self, args):
-        return self._get_value(args)
+    def read(self, params):
+        return self._get_value(params)
 
 
 class SymlinkHandler(BaseHandler):
@@ -71,11 +71,11 @@ class SymlinkHandler(BaseHandler):
         self._other_svc = getattr(connection.system_service(),
                                   self._other_svc)()
 
-    def getattr(self, args):
+    def getattr(self, params):
         return link_stat()
 
-    def readlink(self, args):
-        obj = getattr(self._get_object(args), self._my_attr)
+    def readlink(self, params):
+        obj = getattr(self._get_object(params), self._my_attr)
         objects = self._other_svc.list()
         val = [getattr(x, self._ret_attr) for x in objects if
                getattr(x, self._cmp_attr) == getattr(obj, self._cmp_attr)][0]
