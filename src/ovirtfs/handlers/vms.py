@@ -2,7 +2,10 @@ from . import RootHandler
 from ..resolver import PathResolver
 
 
-@PathResolver("/vms")
-class VMsHandler(RootHandler):
+class BaseVMsMixIn(object):
     _svc_name = "vms_service"
-    _tag_name = "name"
+
+
+@PathResolver("/vms")
+class RootVMsHandler(BaseVMsMixIn, RootHandler):
+    pass

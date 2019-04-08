@@ -4,4 +4,4 @@ from ..resolver import PathResolver
 
 @PathResolver("/")
 class SlashdotHandler(DirNameHandler):
-    dirs = ["hosts", "clusters", "vms", "data_centers"]
+    dirs = ["hosts", "clusters", "vms", "data_centers", "storage_domains"]
