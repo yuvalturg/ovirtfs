@@ -1,4 +1,4 @@
-from . import BaseHandler, DirNameHandler, RawAttrFileHandler
+from . import BaseHandler, DirNameHandler, RegFileHandler
 from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
@@ -19,5 +19,5 @@ class DataCenterNameHandler(BaseDataCenterMixIn, DirNameHandler):
 
 
 @PathResolver(["id"], parent=DataCenterNameHandler)
-class DataCenterFileHandler(BaseDataCenterMixIn, RawAttrFileHandler):
+class DataCenterFileHandler(BaseDataCenterMixIn, RegFileHandler):
     pass

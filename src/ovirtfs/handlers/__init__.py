@@ -44,7 +44,7 @@ class DirNameHandler(BaseHandler):
         return self.content
 
 
-class RawAttrFileHandler(BaseHandler):
+class RegFileHandler(BaseHandler):
     def _get_value(self, params):
         host = self._get_object(params)
         attr = os.path.basename(params["rawpath"])
