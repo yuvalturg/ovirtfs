@@ -35,4 +35,4 @@ class HostFileHandler(BaseHostMixIn, RegFileHandler):
 class HostClusterHandler(BaseHostMixIn, SymlinkHandler):
     _other_svc = "clusters_service"
     _my_attr = "cluster"
-    _lnk_fmt = "../clusters/{}"
+    _lnk_fmt = "../../clusters/{}"

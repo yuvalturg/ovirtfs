@@ -1,21 +1,26 @@
-from . import BaseHandler, RootHandler
-from ..common import subpath, dir_stat
+from . import RootHandler, DirNameHandler, RegFileHandler
+from ..common import subpath
 from ..resolver import PathResolver
 
 
-@PathResolver("/datacenters")
-class DataCentersHandler(RootHandler):
+class BaseDataCenterMixIn(object):
     _svc_name = "data_centers_service"
-    _tag_name = "name"
 
 
-@PathResolver("/datacenters/{}".format(subpath("name")))
-class DCNameHandler(BaseHandler):
-    def __init__(self, connection):
-        self._service = connection.system_service().data_centers_service()
+@PathResolver("/data_centers")
+class RootDataCentersHandler(BaseDataCenterMixIn, RootHandler):
+    pass
 
-    def getattr(self, args):
-        return dir_stat()
 
-    def readdir(self, args):
-        return []
+@PathResolver("/data_centers/{}".format(subpath("name")))
+class DataCenterNameHandler(BaseDataCenterMixIn, DirNameHandler):
+    files = ["id"]
+
+
+@PathResolver("/data_centers/{}/{}".format(
+    subpath("name"),
+    subpath("action", DataCenterNameHandler.files)
+    )
+             )
+class DataCenterFileHandler(BaseDataCenterMixIn, RegFileHandler):
+    pass

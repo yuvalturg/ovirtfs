@@ -46,6 +46,15 @@ DISTCLEANFILES = \
 rpm: dist
 	rpmbuild -ta *.xz
 
+check:
+	@echo "[CHECK] pyflakes"
+	find . -xdev -name \*.py | xargs pyflakes
+	@echo "[CHECK] pylint"
+	find . -xdev -name \*.py | xargs pylint-2
+	@echo "[CHECK] pep8"
+	find . -xdev -name \*.py | xargs pep8
+
+
 clean-local:
 	-rm -rf autom4te.cache *.tar.xz
 	-find -name "*.pyc" -exec rm -f {} \;

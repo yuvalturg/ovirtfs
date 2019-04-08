@@ -31,7 +31,7 @@ class OVirtFS(fuse.Fuse):
             return -errno.ENOENT
         try:
             return handler.getattr(args)
-        except RuntimeError as e:
+        except RuntimeError:
             LOG.error(traceback.format_exc())
             return -errno.ENOENT
 
@@ -73,6 +73,6 @@ class OVirtFS(fuse.Fuse):
             return -errno.ENOENT
         try:
             return handler.readlink(args)
-        except RuntimeError as e:
+        except RuntimeError:
             LOG.error(traceback.format_exc())
             return -errno.ENOENT
