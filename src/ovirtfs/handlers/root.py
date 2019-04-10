@@ -1,4 +1,4 @@
-from . import BaseHandler, DirNameHandler, RegFileHandler
+from . import BaseHandler, DirNameHandler, FileHandler
 from ..resolver import PathResolver
 
 
@@ -8,6 +8,6 @@ class RootHandler(DirNameHandler):
 
 
 @PathResolver("demofile", parent=RootHandler)
-class DemoFileHandler(RegFileHandler):
-    def _get_value(self, params):
-        return "ovirtfs is cool\n"
+class DemoFileHandler(FileHandler):
+    def _set_data(self, params):
+        self._data = "ovirtfs is cool\n"

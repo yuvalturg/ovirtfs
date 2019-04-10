@@ -44,17 +44,24 @@ class DirNameHandler(BaseHandler):
         return self.content
 
 
-class RegFileHandler(BaseHandler):
-    def _get_value(self, params):
-        host = self._get_object(params)
-        attr = os.path.basename(params["rawpath"])
-        return str(getattr(host, attr)) + "\n"
+class FileHandler(BaseHandler):
+    def __init__(self, connection):
+        BaseHandler.__init__(self, connection)
+        self._data = None
+        self._length = 0
 
     def getattr(self, params):
-        return file_stat(size=len(self._get_value(params)))
+        self._set_data(params)
+        return file_stat(size=len(self._data))
 
     def read(self, params):
-        return self._get_value(params)
+        return self._data
+
+
+class RawAttrFileHandler(FileHandler):
+    def _set_data(self, params):
+        obj = self._get_object(params)
+        self._data = str(getattr(obj, params["attr"])) + "\n"
 
 
 class SymlinkHandler(BaseHandler):

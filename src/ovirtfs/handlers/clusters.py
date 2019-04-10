@@ -1,4 +1,4 @@
-from . import BaseHandler, DirNameHandler, RegFileHandler, SymlinkHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler, SymlinkHandler
 from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
@@ -19,7 +19,7 @@ class ClusterNameHandler(BaseClusterMixIn, DirNameHandler):
 
 
 @PathResolver(["id"], parent=ClusterNameHandler)
-class ClusterFileHandler(BaseClusterMixIn, RegFileHandler):
+class ClusterFileHandler(BaseClusterMixIn, RawAttrFileHandler):
     pass
 
 

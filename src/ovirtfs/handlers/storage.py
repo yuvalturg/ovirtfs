@@ -1,4 +1,4 @@
-from . import BaseHandler, DirNameHandler, RegFileHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler
 from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
@@ -19,5 +19,5 @@ class StorageDomainNameHandler(BaseStorageDomainMixIn, DirNameHandler):
 
 
 @PathResolver(["id"], parent=StorageDomainNameHandler)
-class StorageDomainFileHandler(BaseStorageDomainMixIn, RegFileHandler):
+class StorageDomainFileHandler(BaseStorageDomainMixIn, RawAttrFileHandler):
     pass

@@ -1,4 +1,4 @@
-from . import BaseHandler, DirNameHandler, RegFileHandler, SymlinkHandler
+from . import BaseHandler, DirNameHandler, RawAttrFileHandler, SymlinkHandler
 from .root import RootHandler
 from ..common import subpath
 from ..resolver import PathResolver
@@ -19,7 +19,7 @@ class HostNameHandler(BaseHostMixIn, DirNameHandler):
 
 
 @PathResolver(["id", "comment", "status"], parent=HostNameHandler)
-class HostFileHandler(BaseHostMixIn, RegFileHandler):
+class HostFileHandler(BaseHostMixIn, RawAttrFileHandler):
     pass
 
 
