@@ -15,11 +15,17 @@ LOG = logging.getLogger(__package__)
 class OVirtFS(fuse.Fuse):
     def __init__(self, *args, **kwargs):
         fuse.Fuse.__init__(self, *args, **kwargs)
+        self.fqdn = None
+        self.username = None
+        self.password = None
+        self._connection = None
+
+    def initialize(self):
         handlers.init()
         self._connection = sdk.Connection(
-            url='https://192.168.122.115/ovirt-engine/api',
-            username='admin@internal',
-            password='ovirt',
+            url='https://{}/ovirt-engine/api'.format(self.fqdn),
+            username='{}@internal'.format(self.username),
+            password=self.password,
             insecure=True,
             debug=True,
         )

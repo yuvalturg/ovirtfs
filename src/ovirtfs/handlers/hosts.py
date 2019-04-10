@@ -18,7 +18,7 @@ class HostNameHandler(BaseHostMixIn, DirNameHandler):
     content = []
 
 
-@PathResolver(["id", "comment"], parent=HostNameHandler)
+@PathResolver(["id", "comment", "status"], parent=HostNameHandler)
 class HostFileHandler(BaseHostMixIn, RegFileHandler):
     pass
 
