@@ -44,9 +44,7 @@ class PathResolver(object):
                 continue
             params = match.groupdict()
             params.update({"rawpath": path})
-            LOG.debug("Handler %s for [%s], params=%s", rcls, path, params)
             if rcls not in PathResolver._instances:
                 PathResolver._instances[rcls] = rcls(connection)
             return PathResolver._instances[rcls], params
-        LOG.error("Handler was not found for path [%s]", path)
         return None, None

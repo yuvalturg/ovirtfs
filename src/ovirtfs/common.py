@@ -9,9 +9,9 @@ def dir_stat(nlink=1):
     return fst
 
 
-def file_stat(size=0):
+def file_stat(size=0, mode=0o444):
     fst = fuse.Stat()
-    fst.st_mode = stat.S_IFREG | 0o444
+    fst.st_mode = stat.S_IFREG | mode
     fst.st_nlink = 1
     fst.st_size = size
     return fst

@@ -31,8 +31,8 @@ class OVirtFS(fuse.Fuse):
         )
 
     def getattr(self, path):
-        LOG.debug("getattr() called for path=(%s)", path)
         handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Getting attributes with %s, params=%s", handler, params)
         if handler is None:
             return -errno.ENOENT
         try:
@@ -42,24 +42,26 @@ class OVirtFS(fuse.Fuse):
             return -errno.ENOENT
 
     def readdir(self, path, offset):
-        LOG.debug("readdir() called with path=(%s) offset=(%s)", path, offset)
         handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Reading directory with %s, params=%s", handler, params)
         entries = handler.readdir(params)
         for entry in entries:
             yield fuse.Direntry(entry)
 
     def open(self, path, flags):
-        LOG.debug("open() called for path=(%s)", path)
-        handler, _ = PathResolver.parse(path, self._connection)
+        handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Opening file with %s, params=%s", handler, params)
         if handler is None:
             return -errno.ENOENT
-        accmode = os.O_RDONLY | os.O_WRONLY | os.O_RDWR
-        if (flags & accmode) != os.O_RDONLY:
-            return -errno.EACCES
+        # TODO - check modes
+        # accmode = os.O_RDONLY | os.O_WRONLY | os.O_RDWR
+        # if (flags & accmode) != os.O_RDONLY:
+        #     return -errno.EACCES
         return 0
 
     def read(self, path, size, offset):
         handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Reading file with %s, params=%s", handler, params)
         if handler is None:
             return -errno.ENOENT
         data = handler.read(params)
@@ -72,9 +74,26 @@ class OVirtFS(fuse.Fuse):
             buf = ""
         return buf
 
-    def readlink(self, path):
-        LOG.debug("readlink() called for path=(%s)", path)
+    def truncate(self, path, size):
         handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Truncate called for handler=%s, params=%s", handler, params)
+        if handler is None:
+            return -errno.ENOENT
+        return 0
+
+    def write(self, path, buf, offset):
+        handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Writing to file handler=%s, params=%s", handler, params)
+        if handler is None:
+            return -errno.ENOENT
+        try:
+            return handler.write(buf, params)
+        except RuntimeError:
+            return -errno.EINVAL
+
+    def readlink(self, path):
+        handler, params = PathResolver.parse(path, self._connection)
+        LOG.debug("Reading symlink with %s, params=%s", handler, params)
         if handler is None:
             return -errno.ENOENT
         try:

@@ -45,6 +45,8 @@ class DirNameHandler(BaseHandler):
 
 
 class FileHandler(BaseHandler):
+    _mode = 0o444
+
     def __init__(self, connection):
         BaseHandler.__init__(self, connection)
         self._data = None
@@ -52,7 +54,7 @@ class FileHandler(BaseHandler):
 
     def getattr(self, params):
         self._set_data(params)
-        return file_stat(size=len(self._data))
+        return file_stat(size=len(self._data), mode=self._mode)
 
     def read(self, params):
         return self._data
