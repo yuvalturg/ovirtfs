@@ -101,3 +101,15 @@ class OVirtFS(fuse.Fuse):
         except RuntimeError:
             LOG.error(traceback.format_exc())
             return -errno.ENOENT
+
+    def rename(self, old, new):
+        old_h, old_p = PathResolver.parse(old, self._connection)
+        new_h, new_p = PathResolver.parse(new, self._connection)
+        LOG.debug("Rename %s -> %s with %s and %s", old, new, old_h, new_h)
+        if None in (old_h, new_h):
+            return -errno.EINVAL
+        try:
+            return old_h.rename(new_h, old_p, new_p)
+        except RuntimeError:
+            LOG.error(traceback.format_exc())
+            return -errno.EINVAL

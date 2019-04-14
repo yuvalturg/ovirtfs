@@ -1,6 +1,8 @@
 import errno
 import logging
 
+import ovirtsdk4.types as types
+
 from . import BaseHandler, DirNameHandler, RawAttrFileHandler, SymlinkHandler
 from .root import RootHandler
 from ..common import subpath
@@ -22,6 +24,23 @@ class RootHostsHandler(BaseHostMixIn, BaseHandler):
 @PathResolver(subpath("name"), parent=RootHostsHandler)
 class HostNameHandler(BaseHostMixIn, DirNameHandler):
     content = []
+
+    def rename(self, new_h, old_p, new_p):
+        assert self == new_h
+        old_host = self._get_object(old_p)
+        if not old_host:
+            return -errno.ENOENT
+        # Return EINVAL if the new destination exists
+        try:
+            self._get_object(new_p)
+            return -errno.EINVAL
+        except RuntimeError:
+            pass
+        svc = self._service.host_service(old_host.id)
+        update_host = types.Host()
+        update_host.name = new_p["name"]
+        svc.update(update_host)
+        return 0
 
 
 @PathResolver(["id", "comment"], parent=HostNameHandler)
